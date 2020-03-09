@@ -5,7 +5,7 @@ class Despesa {
         this.dia = dia
         this.tipo = tipo
         this.descricao = descricao
-        this.valor =parseFloat( valor)
+        this.valor = valor
     }
 
     validarDados() {
@@ -46,7 +46,7 @@ class BD {
         localStorage.setItem('id', id)
     }
 
-    carregarTodasdespesas() {
+    carregarTodasDespesas() {
         let despesas = Array()
         let id = localStorage.getItem('id')
 
@@ -62,6 +62,39 @@ class BD {
         return despesas
 
     }
+    pesquisar(despesa) {
+        let despesasFiltradas = Array()
+        despesasFiltradas = this.carregarTodasDespesas();
+
+        console.log(despesasFiltradas)
+
+        if (despesa.ano != '') {
+            console.log('filtro ano')
+            despesasFiltradas = despesasFiltradas.filter(d => d.ano == despesa.ano)
+        }
+        if (despesa.mes != '') {
+            console.log('filtro mes')
+            despesasFiltradas = despesasFiltradas.filter(d => d.mes == despesa.mes)
+        }
+        if (despesa.dia != '') {
+            console.log(' filtro dia')
+            despesasFiltradas = despesasFiltradas.filter(d => d.dia == despesa.dia)
+        }
+        if (despesa.tipo != '') {
+            console.log(' filtro tipo')
+            despesasFiltradas = despesasFiltradas.filter(d => d.tipo == despesa.tipo)
+        }
+        if (despesa.descricao != '') {
+            console.log('filtro descricao')
+            despesasFiltradas = despesasFiltradas.filter(d => d.descricao == despesa.descricao)
+        }
+        if (despesa.valor != '') {
+            console.log('filtro valor')
+            despesasFiltradas = despesasFiltradas.filter(d => d.valor == despesa.valor)
+        }
+
+        return despesasFiltradas
+    }
 }
 
 let bd = new BD()
@@ -70,7 +103,7 @@ let bd = new BD()
 function cadastrarDespesa() {
     let ano = document.getElementById('ano')
     let mes = document.getElementById('mes')
-    document.getElementById('dia')
+    let dia = document.getElementById('dia')
     let tipo = document.getElementById('tipo')
     let descricao = document.getElementById('descricao')
     let valor = document.getElementById('valor')
@@ -105,18 +138,21 @@ function cadastrarDespesa() {
     }
 }
 
-function listarTodasDespesas() {
-    let despesas = Array()
-    despesas = bd.carregarTodasdespesas()
+function listarTodasDespesas(despesas = Array(),filtro = false) {
+    
+    if (despesas.length == 0 && filtro == false) {
+        despesas = bd.carregarTodasDespesas()
+    }
 
     let listaDespesas = document.getElementById('listaDespesas')
+    listaDespesas.innerHTML = ''
 
     despesas.forEach(function (d) {
         let linha = listaDespesas.insertRow()
 
         linha.insertCell(0).innerHTML = `${d.dia}/${d.mes}/${d.ano}`
         switch (d.tipo) {
-            case '1': d.tipo = 'Alimentaçaõ'
+            case '1': d.tipo = 'Alimentação'
                 break
             case '2': d.tipo = 'Educação'
                 break
@@ -132,6 +168,22 @@ function listarTodasDespesas() {
         linha.insertCell(3).innerHTML = `R$ ${d.valor}`
 
     })
+}
+
+function pesquisarDespesa() {
+    let ano = document.getElementById('ano').value
+    let mes = document.getElementById('mes').value
+    let dia = document.getElementById('dia').value
+    let tipo = document.getElementById('tipo').value
+    let descricao = document.getElementById('descricao').value
+    let valor = document.getElementById('valor').value
+
+    let despesa = new Despesa(ano, mes, dia, tipo, descricao, valor)
+
+    let despesas = bd.pesquisar(despesa)
+
+    listarTodasDespesas(despesas,true)
+
 }
 
 
